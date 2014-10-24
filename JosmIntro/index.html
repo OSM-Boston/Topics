@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<title>Welcome to Maptime Boston!</title>
+<link target="_blank" href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+<style>
+
+/*
+This template was taken from
+https://github.com/maptimeBoston/better-know-a-slippy-map
+
+SLIDE STYLES:
+All slides are assumed to contain one 'p' element, one
+'img' element, or one of each.
+
+div class="slide"
+ -- Default style. If no image, text
+is centered. If image present, it is centered and text
+is at the top. -- Arbitrary content could go here too
+(e.g. I used a couple of iframes), but default
+behavior will mess with any p or img elements.
+
+div class="slide image_full"
+ -- Full 1024x768 img,
+somewhat faded to black and with bold white text (p)
+centered on top.
+
+div class="slide image_bottom"
+ -- Mostly like default
+except that image appears at the bottom. (Basically
+just to give more room for longer text).
+Can make additional class styles for p elements and such
+if you need different text sizes, colors, etc. (e.g.
+there is a p.title style with a bigger font)
+
+img elements themselves are not displayed; rather, their
+src attributes are applied as div backgrounds. This is
+to make centering easier, basically.
+*/
+
+html, body{
+margin: 0;
+font: 20px/24px "PT Sans", sans-serif;
+background-color: #000;
+color: #cb9
+}
+.slide, .slide div{
+position: absolute;
+top: 0;
+left: 0;
+width: 1024px;
+height: 768px;
+background-position: center center;
+background-repeat: no-repeat;
+font-size: 64px;
+line-height: 72px;
+font-weight: bold;
+}
+.slide{
+background-color: #000;
+}
+.slide.image_bottom{
+background-position: center bottom;
+}
+.slide p{
+position: absolute;
+text-align: center;
+margin: 15px 1% 0 1%;
+width: 98%;
+}
+.slide img{
+display: none;
+}
+.slide.image_full{
+background-color: black;
+}
+
+.slide.image_full div{
+ opacity: .4;
+}
+.slide.image_full p{
+color: white;
+text-shadow:0px 0px 10px #000000;
+}
+.slide p.title{
+font-size: 84px;
+line-height: 94px;
+}
+
+.slide.bullets p{
+text-align: left;
+margin-left: 5%;
+width: 90%;
+}
+
+.slide.bullets ul{
+position: absolute;
+margin-left: 5%;
+width: 90%;
+}
+
+.slide ul.contact{
+line-height: 52px;
+font-weight: normal;
+}
+
+.slide ul.contact li{
+margin-top: 20px;
+}
+
+.slide ul.contact span{
+font-size: 48px;
+}
+
+a{
+color: #669;
+text-decoration: none;
+}
+
+a:hover{
+text-decoration: underline;
+}
+
+a.citation{
+position: absolute;
+bottom: 5px;
+right: 5px;
+color: #acd;
+font-size: 18px;
+line-height: 24px;
+}
+
+em { color: #fff; font-style: normal; }
+i { color: #7cc; }
+
+.code{
+font-family: 'Courier New';
+}
+</style>
+</head>
+<body>
+
+
+
+
+<div class="slide image_bottom">
+  <p>OSM Editing - Beyond Basics<br/>
+  <i>lars@ahlzen.com</i>
+  </p>
+  <img src="images/OsmBostonBlack.jpg">
+</div>
+
+<div class="slide image_full">
+  <p>JOSM</p>
+   <img src="images/josm.png">
+</div>
+
+
+<div class="slide bullets">
+   <p>Prerequisites</p>
+   <ul>
+   <li>Java (probably already installed)<br/>
+   <a href="https://java.com/download">https://java.com/download</a>
+   <li>Download JOSM at <a href="http://josm.openstreetmap.de">http://josm.openstreetmap.de</a></br>
+   (use josm-tested, or use web starter)
+   </li>
+   </ul>
+</div>
+
+<div class="slide bullets">
+   <p>Always checks for most recent version on startup</p>
+   <ul><li>Download new one if needed. Update plugins.</li></ul>
+</div>
+
+<div class="slide image_full">
+  <p>Setting up JOSM</p>
+   <img src="images/josm.png">
+</div>
+
+<div class="slide bullets">
+   <p>Preferences</p>
+   <ul>
+      <li>Enter OSM username and password</li>
+      <li><i>(optional)</i> Add plugins</li>
+      <li><i>(optional)</i> Add additional imagery</li>
+   </ul>
+</div>
+
+<div class="slide bullets">
+   <p>Recommended plugins</p>
+   <ul>
+     <li><em>EditGPX</em> (if you'll be working with GPS data)</li>
+     <li><em>Field Papers</em> (low-tech surveys)</li>
+     <li><em>House Number Tagging Tool</em> (for entering lots of addresses)</li>
+     <li><em>Mirrored Download</em> (for downloading data from OSM mirrors)</li>
+     <li><em>Opening Hours Editor</em> (adding/editing businesses)</li>
+     <li><em>Notes</em> (view/add/edit map notes)</li>
+  </ul>
+</div>
+
+<div class="slide bullets">
+   <p>Additional imagery</p>
+   <ul>
+     <li>More on this later....</li>
+   </ul>
+</div>
+
+<div class="slide bullets">
+   <p>Differences from iD</p>
+   <ul>
+   <li>Work on a specific <i>area at a time</i></li>
+   <li><i>Faster</i> and more responsive, especially for larger areas</li>
+   <li><i>Plugins</i> for almost any type of task</li>
+   <li>More exposure to the "raw" data</li>
+   <ul>
+</div>
+
+<div class="slide">
+   <p>Quick recap:<br><em>OSM data model</em></p>
+</div>
+
+<div class="slide image_bottom">
+<ul>
+<li><em>Nodes</em> (e.g. points-of-interest)</li>
+<li><em>Ways</em> (linear features, or areas)</li>
+<li><em>Relations</em> (multipolygons, routes...)</li>
+</ul>
+<img src="images/node-way-relation400.png"/>
+</div>
+
+<div class="slide bullets">
+Tagging is freeform key/value. 
+<ul>
+<li>JOSM has presets.</li>
+<li>Use <a href="http://wiki.openstreetmap.org/wiki/Map_features">wiki</a> as reference<br>
+   <i>Tip: Add search shortcut in your browser</i>
+<li>No hard rules. Goverened by consensus</li>
+<li>All that is <em>verifiable</em> can be mapped</li>
+<li><a href="http://taginfo.openstreetmap.us/">TagInfo</a> can be helpful</li>
+</ul>
+</div>
+
+<div class="slide bullets">
+   <p>JOSM has two main tools:</p>
+   <ul>
+   <li><em>Select</em></li>
+   <li><em>Add</em></li>
+   </ul>
+</div>
+
+<div class="slide bullets">
+   <p>Learn and use keyboard shortcuts</br>
+   <i>(in hovertext)</i>
+   <ul>
+   <li><em>S:</em> Select
+   <li><em>A:</em> Add nodes
+   <li><em>Alt-A:</em> Add tag
+   <li><em>W:</em> Improve accuracy
+   <li><em>Q:</em> Orthogonalize
+   <li><em>O/L:</em> Align in Circle/Line
+   </ul>
+</div>
+
+<div class="slide bullets">
+   <p>Imagery</p>
+   <ul>
+   <li><em>Bing/MapBox satellite</em> (great for tracing roads, buildings, etc)</li>
+   <li><em>Tiger 2013</em> (street names)</li>
+   <li><em>USGS/MSR Topo</em> (features names)</li>
+   <li><em>MassGIS L3 Parcels</em> (boundaries)</li>
+   </ul>
+</div>
+
+<div class="slide">
+   <p>Demo</p>
+</div>
+
+
+<script>
+// The following is mostly derived from https://github.com/tmcw/big
+
+var slides = document.getElementsByClassName("slide"),
+current = 0;
+
+function go(n){
+current = n;
+var slide = slides[n],
+classes = slide.className.split(" ");
+for (var i = 0; i < slides.length; i++) slides[i].style.display = 'none';
+slide.style.display = 'block';
+
+slide.style.left = (window.innerWidth - slide.offsetWidth) / 2 + "px";
+slide.style.top = (window.innerHeight - slide.offsetHeight) / 2 + "px";
+
+if ( classes[1] && styleSlide[classes[1]] ) styleSlide[classes[1]](slide);
+else styleSlide.normal(slide);
+resize();
+
+if (window.location.hash !== n) window.location.hash = n;
+}
+
+var styleSlide = {
+heading: function(slide){
+var p = slide.getElementsByTagName("p")[0];
+p.style.marginTop = (slide.offsetHeight - p.offsetHeight) / 2 + "px";
+},
+
+img: function(slide){
+var img = slide.getElementsByTagName("img")[0];
+slide.style.backgroundImage = 'url(' + img.src + ')';
+img.style.display = 'none';
+},
+
+image_full: function(slide){
+var img = slide.getElementsByTagName("img")[0];
+var p = slide.getElementsByTagName("p")[0];
+var div = slide.getElementsByTagName("div")[0] || document.createElement("div");
+div.style.backgroundImage = 'url(' + img.src + ')';
+slide.insertBefore(div,p);
+img.style.display = 'none';
+p.style.marginTop = (slide.offsetHeight - p.offsetHeight) / 2 + "px";
+},
+
+img_top: function(slide){
+var img = slide.getElementsByTagName("img")[0];
+slide.style.backgroundImage = 'url(' + img.src + ')';
+img.style.display = 'none';
+},
+
+img_bottom: function(slide){
+var img = slide.getElementsByTagName("img")[0];
+slide.style.backgroundImage = 'url(' + img.src + ')';
+img.style.display = 'none';
+},
+
+normal: function(slide){
+var img = slide.getElementsByTagName("img")[0];
+var p = slide.getElementsByTagName("p")[0];
+
+if ( img ){
+slide.style.backgroundImage = 'url(' + img.src + ')';
+} else {
+if ( p ){
+p.style.marginTop = (slide.offsetHeight - p.offsetHeight) / 2 + "px";
+}
+}
+},
+
+bullets: function(slide){
+var p = slide.getElementsByTagName("p")[0];
+var ul = slide.getElementsByTagName("ul")[0];
+ul.style.marginTop = (slide.offsetHeight - ul.offsetHeight) / 2 + "px";
+if ( p ){
+p.style.marginTop = (slide.offsetHeight - ul.offsetHeight) / 2 - p.offsetHeight + "px";
+}
+}
+}
+
+document.onclick = function() { go(++current % (slides.length)); };
+    function fwd() { go(Math.min(slides.length - 1, ++current)); }
+    function rev() { go(Math.max(0, --current)); }
+    document.onkeydown = function(e) {
+        if (e.which === 39 || e.which === 34 || e.which === 40) fwd();
+        if (e.which === 37 || e.which === 33 || e.which === 38) rev();
+    };
+    document.ontouchstart = function(e) {
+        var x0 = e.changedTouches[0].pageX;
+        document.ontouchend = function(e) {
+            var x1 = e.changedTouches[0].pageX;
+            if (x1 - x0 < 0) fwd();
+            if (x1 - x0 > 0) rev();
+        };
+    };
+
+    function parse_hash() {
+        return Math.max(Math.min(slides.length - 1,
+            parseInt(window.location.hash.substring(1), 10)), 0);
+    }
+    if (window.location.hash) current = parse_hash() || current;
+    window.onhashchange = function() {
+        var c = parse_hash();
+        if (c !== current) go(c);
+    };
+    window.onresize = resize;
+
+    function resize(){
+     var s = Math.min( 1, Math.min( window.innerHeight / 768, window.innerWidth / 1024 ) );
+     slides[current].style.webkitTransform = "scale(" + s + "," + s +")";
+slides[current].style.MozTransform = "scale(" + s + "," + s +")";
+slides[current].style.msTransform = "scale(" + s + "," + s +")";
+slides[current].style.transform = "scale(" + s + "," + s +")";
+    }
+    go(current);
+</script>
+
+</body>
+</html>
+
+
