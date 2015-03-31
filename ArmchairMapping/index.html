@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<title>OSM Boston - Armchair Mapping Special</title>
+<link target="_blank" href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+<style>
+
+/*
+This template was taken from
+https://github.com/maptimeBoston/better-know-a-slippy-map
+
+SLIDE STYLES:
+All slides are assumed to contain one 'p' element, one
+'img' element, or one of each.
+
+div class="slide"
+ -- Default style. If no image, text
+is centered. If image present, it is centered and text
+is at the top. -- Arbitrary content could go here too
+(e.g. I used a couple of iframes), but default
+behavior will mess with any p or img elements.
+
+div class="slide image_full"
+ -- Full 1024x768 img,
+somewhat faded to black and with bold white text (p)
+centered on top.
+
+div class="slide image_bottom"
+ -- Mostly like default
+except that image appears at the bottom. (Basically
+just to give more room for longer text).
+Can make additional class styles for p elements and such
+if you need different text sizes, colors, etc. (e.g.
+there is a p.title style with a bigger font)
+
+img elements themselves are not displayed; rather, their
+src attributes are applied as div backgrounds. This is
+to make centering easier, basically.
+*/
+
+html, body{
+margin: 0;
+font: 18px/22px "PT Sans", sans-serif;
+background-color: #000;
+color: #cb9
+}
+.slide, .slide div{
+position: absolute;
+top: 0;
+left: 0;
+width: 1080px;
+height: 780px;
+background-position: center center;
+background-repeat: no-repeat;
+font-size: 60px;
+line-height: 68px;
+font-weight: bold;
+}
+.slide{
+background-color: #000;
+}
+.slide.image_bottom{
+background-position: center bottom;
+background-size: 90%;
+}
+.slide p{
+position: absolute;
+text-align: center;
+margin: 15px 1% 0 1%;
+width: 98%;
+}
+.slide img{
+display: none;
+}
+.slide.image_full{
+background-color: black;
+}
+
+.slide.image_full div{
+ /*opacity: .4;*/
+}
+.slide.image_full p{
+color: white;
+text-shadow:0px 0px 10px #000000;
+}
+.slide p.title{
+font-size: 84px;
+line-height: 94px;
+}
+
+.slide.bullets p{
+text-align: left;
+margin-left: 5%;
+width: 90%;
+}
+
+.slide.bullets ul{
+position: absolute;
+margin-left: 5%;
+width: 90%;
+}
+
+.slide ul.contact{
+line-height: 52px;
+font-weight: normal;
+}
+
+.slide ul.contact li{
+margin-top: 20px;
+}
+
+.slide ul.contact span{
+font-size: 48px;
+}
+
+a{
+color: #669;
+text-decoration: none;
+}
+
+a:hover{
+text-decoration: underline;
+}
+
+a.citation{
+position: absolute;
+bottom: 5px;
+right: 5px;
+color: #acd;
+font-size: 18px;
+line-height: 24px;
+}
+
+em { color: #fff; font-style: normal; }
+i { color: #7cc; }
+
+.code{
+font-family: 'Courier New';
+}
+</style>
+</head>
+<body>
+
+
+
+
+<div class="slide image_bottom">
+  <p>Armchair Mapping Special<br/>
+  <i>Tasks, Tips, Techniques</i>
+  </p>
+  <img src="images/OsmBostonBlack.jpg">
+</div>
+
+
+
+<!-- MapRoulette -->
+
+<div class="slide">
+  <p class="title">MapRoulette</p>
+</div>
+
+<div class="slide">
+  <p>Quick, simple tasks that can usually be done by
+  inspecting aerial imagery.</p>
+</div>
+
+<div class="slide image_bottom">
+  <p style="color: #fb3">Warning: Highly addictive!</p>
+  <img src="images/warning.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    <a href="http://maproulette.org/">http://maproulette.org</a>
+  </p>
+  <img src="images/maproulette1.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    <i>Example:</i><br/>
+    Highway Intersecting Building
+  </p>
+  <img src="images/maproulette2.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Edit in JOSM (or iD)
+  </p>
+  <img src="images/maproulette3.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Use Bing aerial imagery
+  </p>
+  <img src="images/maproulette4.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Correct alignment
+  </p>
+  <img src="images/maproulette5.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Save changes
+  </p>
+  <img src="images/maproulette6.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    <i>"I fixed it!"</i>
+  </p>
+  <img src="images/maproulette7.png">
+</div>
+
+<div class="slide">
+  <p>
+    <a href="http://maproulette.org" target="_blank">demo</a>?
+  </p>
+</div>
+
+<!-- MassGIS OpenSpace -->
+
+<div class="slide">
+  <p class="title">MassGIS<br/>OpenSpace</p>
+</div>
+
+<div class="slide">
+  <p>Many imported parks and conservation lands
+  have bad alignment.</p>
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Browse the map for suspects
+  </p>
+  <img src="images/openspace1.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Edit with JOSM or iD
+  </p>
+  <img src="images/openspace2.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Use MassGIS L3 Parcel Layer
+    to correct alignment
+  </p>
+  <img src="images/openspace3.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Remove bad data
+  </p>
+  <img src="images/openspace4.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Fix alignment
+  </p>
+  <img src="images/openspace5.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    
+  </p>
+  <img src="images/openspace6.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Check tagging
+  </p>
+  <img src="images/openspace7.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+  </p>
+  <img src="images/openspace8.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Use topo maps and other resources
+  </p>
+  <img src="images/openspace9.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Clean up surroundings
+  </p>
+  <img src="images/openspace10.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Done!
+  </p>
+  <img src="images/openspace11.png">
+</div>
+
+<div class="slide">
+  <p>
+    <a href="http://osm.org" target="_blank">demo</a>?
+  </p>
+</div>
+
+
+<!-- Unreviewed Oneways -->
+
+<div class="slide">
+  <p class="title">Unreviewed Oneways</p>
+</div>
+
+<div class="slide">
+  <p>Direction of oneway streets from MassGIS
+  is not known.</p>
+</div>
+
+
+<div class="slide image_bottom">
+  <p>
+     Use a QA tool, like OSMi, to find work.
+  </p>
+  <img src="images/oneways1.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    JOSM highly recommended
+  </p>
+  <img src="images/oneways2.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Use JOSM's filters
+  </p>
+  <img src="images/oneways3.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+  </p>
+  <img src="images/oneways4.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Invert filter to highlight
+    Unreviewed Oneways.
+  </p>
+  <img src="images/oneways5.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Use Bing or MapBox to find
+    aactual direction.
+  </p>
+  <img src="images/oneways6.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Reverse direction if necessary
+    (do NOT change tags)
+  </p>
+  <img src="images/oneways7.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Remove note="FIXME..."
+  </p>
+  <img src="images/oneways8.png">
+</div>
+
+<div class="slide">
+  <p>
+    <a href="http://tools.geofabrik.de/osmi/?view=tagging&lon=-71.07383&lat=42.34638&zoom=13&overlays=fixmes_on_nodes,fixmes_on_ways" target="_blank">demo</a>?
+  </p>
+</div>
+
+
+<!-- Coastline -->
+
+<div class="slide">
+  <p class="title">Coastline</p>
+</div>
+
+<div class="slide">
+  <p>Coastline (and abutting features) rough in many places</p>
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Example: Plymouth Harbor
+  </p>
+  <img src="images/coastline1.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Load in JOSM (or iD)
+  </p>
+  <img src="images/coastline2.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Use aerial imagery for alignment
+  </p>
+  <img src="images/coastline3.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Careful when editing coastline!!
+  </p>
+  <img src="images/coastline4.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Coastline done. Next: Abutments
+  </p>
+  <img src="images/coastline5.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Use Parcel Layer. Cut/split polygons if necessary.
+  </p>
+  <img src="images/coastline6.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+  </p>
+  <img src="images/coastline7.png">
+</div>
+
+<div class="slide">
+  <p>
+    <a href="http://osm.org/" target="_blank">demo</a>?
+  </p>
+</div>
+
+
+<!-- HOT -->
+
+<div class="slide">
+  <p class="title">HOT:<br/>
+  <i>the Humanitarian OpenStreetMap Team</i></p>
+</div>
+
+<div class="slide">
+  <p>Map to save lives and make the world a better place.</p>
+</div>
+
+<div class="slide">
+  <p>Some OSM experience recommended.</p>
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    <a href="http://hot.osm.org/">http://hot.osm.org/</a>
+  </p>
+  <img src="images/hot1.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    <a href="http://hot.osm.org/">http://hot.osm.org/</a>
+  </p>
+  <img src="images/hot1.png">
+</div>
+
+<div class="slide image_full">
+  <img src="images/hot2.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Follow HOT mailing lists
+  </p>
+  <img src="images/hot3.png">
+</div>
+
+<div class="slide image_full">
+  <img src="images/hot4.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Active projects in Tasking Manager
+  </p>
+  <img src="images/hot5.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Project description
+  </p>
+  <img src="images/hot6.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Read description carefully!
+  </p>
+  <img src="images/hot7.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Pick an area to work on
+  </p>
+  <img src="images/hot8.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Areas are validated by experience mappers
+  </p>
+  <img src="images/hot8.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    <a href="http://www.missingmaps.org">Missing maps</a>: Map proactively!
+  </p>
+  <img src="images/hot10.png">
+</div>
+
+<div class="slide">
+  <p>
+    <a href="http://tasks.hotosm.org/" target="_blank">demo</a>?
+  </p>
+</div>
+
+
+<!-- Keepright -->
+
+<div class="slide">
+  <p class="title">KeepRight</p>
+</div>
+
+<div class="slide">
+  <p>Automatically scans OSM for potential errors</p>
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    <a href="http://keepright.ipax.at">http://keepright.ipax.at/</a>
+  </p>
+  <img src="images/keepright1.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Example: No tags.
+  </p>
+  <img src="images/keepright2.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Fix.
+  </p>
+  <img src="images/keepright3.png">
+</div>
+
+<div class="slide">
+  <p>
+    <a href="http://keepright.ipax.at" target="_blank">demo</a>?
+  </p>
+</div>
+
+
+<!-- OSM Inspector -->
+
+<div class="slide">
+  <p class="title">OSM Inspector</p>
+</div>
+
+<div class="slide">
+  <p>Another QA tool. From <a href="http://geofabrik.de">Geofabrik</a></p>
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Example 1: Self-intersecting ways
+  </p>
+  <img src="images/osmi1.png">
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Example 2: Tagging problems
+  </p>
+  <img src="images/osmi2.png">
+</div>
+
+<div class="slide">
+  <p>
+    <a href="http://tools.geofabrik.de/osmi" target="_blank">demo</a>?
+  </p>
+</div>
+
+
+<!-- Map notes -->
+
+<div class="slide">
+  <p class="title">Map Notes</p>
+</div>
+
+<div class="slide">
+  <p>Use when armchair mapping is not enough!</p>
+</div>
+
+<div class="slide image_bottom">
+  <p>
+    Example
+  </p>
+  <img src="images/mapnotes1.png">
+</div>
+
+<div class="slide">
+  <p>
+    <a href="" target="_blank">demo</a>?
+  </p>
+</div>
+
+
+<div class="slide">
+  <p>
+  Lars Ahlzen <br/>
+  <a href="mailto:lars@ahlzen.com">lars@ahlzen.com</a><br/>
+  <a href="http://www.meetup.com/OpenStreetMap-Boston/">OSM Boston</a>
+  </p>
+</div>
+
+
+
+<script>
+// The following is mostly derived from https://github.com/tmcw/big
+
+var slides = document.getElementsByClassName("slide"),
+current = 0;
+
+function go(n){
+current = n;
+var slide = slides[n],
+classes = slide.className.split(" ");
+for (var i = 0; i < slides.length; i++) slides[i].style.display = 'none';
+slide.style.display = 'block';
+
+slide.style.left = (window.innerWidth - slide.offsetWidth) / 2 + "px";
+slide.style.top = (window.innerHeight - slide.offsetHeight) / 2 + "px";
+
+if ( classes[1] && styleSlide[classes[1]] ) styleSlide[classes[1]](slide);
+else styleSlide.normal(slide);
+resize();
+
+if (window.location.hash !== n) window.location.hash = n;
+}
+
+var styleSlide = {
+heading: function(slide){
+var p = slide.getElementsByTagName("p")[0];
+p.style.marginTop = (slide.offsetHeight - p.offsetHeight) / 2 + "px";
+},
+
+img: function(slide){
+var img = slide.getElementsByTagName("img")[0];
+slide.style.backgroundImage = 'url(' + img.src + ')';
+img.style.display = 'none';
+},
+
+image_full: function(slide){
+var img = slide.getElementsByTagName("img")[0];
+var p = slide.getElementsByTagName("p")[0];
+var div = slide.getElementsByTagName("div")[0] || document.createElement("div");
+div.style.backgroundImage = 'url(' + img.src + ')';
+slide.insertBefore(div,p);
+img.style.display = 'none';
+p.style.marginTop = (slide.offsetHeight - p.offsetHeight) / 2 + "px";
+},
+
+img_top: function(slide){
+var img = slide.getElementsByTagName("img")[0];
+slide.style.backgroundImage = 'url(' + img.src + ')';
+img.style.display = 'none';
+},
+
+img_bottom: function(slide){
+var img = slide.getElementsByTagName("img")[0];
+slide.style.backgroundImage = 'url(' + img.src + ')';
+img.style.display = 'none';
+},
+
+normal: function(slide){
+var img = slide.getElementsByTagName("img")[0];
+var p = slide.getElementsByTagName("p")[0];
+
+if ( img ){
+slide.style.backgroundImage = 'url(' + img.src + ')';
+} else {
+if ( p ){
+p.style.marginTop = (slide.offsetHeight - p.offsetHeight) / 2 + "px";
+}
+}
+},
+
+bullets: function(slide){
+var p = slide.getElementsByTagName("p")[0];
+var ul = slide.getElementsByTagName("ul")[0];
+ul.style.marginTop = (slide.offsetHeight - ul.offsetHeight) / 2 + "px";
+if ( p ){
+p.style.marginTop = (slide.offsetHeight - ul.offsetHeight) / 2 - p.offsetHeight + "px";
+}
+}
+}
+
+document.onclick = function() { go(++current % (slides.length)); };
+    function fwd() { go(Math.min(slides.length - 1, ++current)); }
+    function rev() { go(Math.max(0, --current)); }
+    document.onkeydown = function(e) {
+        if (e.which === 39 || e.which === 34 || e.which === 40) fwd();
+        if (e.which === 37 || e.which === 33 || e.which === 38) rev();
+    };
+    document.ontouchstart = function(e) {
+        var x0 = e.changedTouches[0].pageX;
+        document.ontouchend = function(e) {
+            var x1 = e.changedTouches[0].pageX;
+            if (x1 - x0 < 0) fwd();
+            if (x1 - x0 > 0) rev();
+        };
+    };
+
+    function parse_hash() {
+        return Math.max(Math.min(slides.length - 1,
+            parseInt(window.location.hash.substring(1), 10)), 0);
+    }
+    if (window.location.hash) current = parse_hash() || current;
+    window.onhashchange = function() {
+        var c = parse_hash();
+        if (c !== current) go(c);
+    };
+    window.onresize = resize;
+
+    function resize(){
+     var s = Math.min( 1, Math.min( window.innerHeight / 768, window.innerWidth / 1024 ) );
+     slides[current].style.webkitTransform = "scale(" + s + "," + s +")";
+slides[current].style.MozTransform = "scale(" + s + "," + s +")";
+slides[current].style.msTransform = "scale(" + s + "," + s +")";
+slides[current].style.transform = "scale(" + s + "," + s +")";
+    }
+    go(current);
+</script>
+
+</body>
+</html>
+
+
