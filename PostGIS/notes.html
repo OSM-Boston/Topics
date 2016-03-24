@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<title>OSM Boston - Using OSM data with PostGIS</title>
+<link target="_blank" href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+<style>
+html, body{
+  margin: 5px;
+  font: 22px "PT Sans", sans-serif;
+  background-color: #000;
+  color: #cb9
+}
+hr.break { margin-top: 5em; border: 3px solid #333; }
+code, .code { color: #afa; background: #222; font-family: monospace; white-space: pre; }
+code, div.code { border: 2px solid #752; padding: 0.5em; margin: 1em;}
+em { color: white; font-style: normal; font-weight: bold; }
+a { color: #aaf; }
+h2 { margin-top: 2em; }
+</style>
+</head>
+<body>
+
+
+<img src="OsmBostonBannerV1_blackBg.jpg" style="margin-bottom: 4em"/>
+
+<h1>Using OSM Data with PostGIS</h1>
+<p>
+Lars Ahlzen<br/>
+3/24/2016
+</p>
+
+<p style="vertical-align: baseline;">
+<img src="osmlogo.png" style="width: 25%"/>
+<span style="font-size: 500%">+</span>
+<img src="pglogo.png" style="width: 25%"/>
+</p>
+
+
+<hr class="break"/>
+
+
+<h2>Setting up PostgreSQL/PostGIS</h2>
+<p>
+<em>Linux</em>: Use package manger. E.g.
+<div class="code">apt-get install postgresql</div>
+<br/>
+<em>Win/Mac</em>: Download installer from <a href="http://www.postgresql.org/download/">postgresql.org/download/</a>
+</p>
+
+<p>Use pgAdmin (GUI) or psql (command line) to create database and install extensions. Example:</p>
+<div class="code">lars@geovm1:~$ psql -U lars -h localhost postgres
+psql (9.3.11)
+Type "help" for help.
+
+postgres=# create database gis with owner=lars encoding='UTF8';
+CREATE DATABASE
+
+postgres=# \q
+
+lars@geovm1:~$ psql -U lars -h localhost gis
+
+gis=# create extension postgis;
+CREATE EXTENSION
+
+gis=# create extension hstore;
+CREATE EXTENSION
+</div>
+
+<p>Control access with <a href="http://www.postgresql.org/docs/9.3/static/auth-pg-hba-conf.html">pg_hba.conf</a></p>
+
+
+<p>
+Tuning the database:
+<ul>
+<li><a href="http://wiki.openstreetmap.org/wiki/PostgreSQL">http://wiki.openstreetmap.org/wiki/PostgreSQL</a><br/>
+<li><a href="http://www.geofabrik.de/media/2012-09-08-osm2pgsql-performance.pdf">Fredrik Ramm's notes from SotM 2012</a>
+</ul>
+</p>
+
+
+<hr class="break"/>
+
+<h2>Downloading OSM data</h2>
+<ul>
+<li><em>Small areas:</em> Directly from <a href="http://www.osm.org">osm.org</a> export tab. Real-time.</li>
+<li><em>Larger areas:</em> From the Overpass API (OSM mirror database). Link at <a href="http://www.osm.org">osm.org</a></li>
+<li><em>Regional extracts:</em> <a href="http://download.geofabrik.de/">GeoFabrik</a>. Updated daily. Has shapefiles, too!</li>
+<li><em>Whole planet:</em> at <a href="http://planet.osm.org/">planet.osm.org</a>: 48 GB as of March 2016.</li>
+</ul>
+
+<h2>OSM Data File Formats</h2>
+<ul>
+<li><em>.osm</em> - XML based format.
+<li><em>.osm.gz</em> - compressed OSM XML.
+<li><em>.osm.bz2</em> - compressed OSM XML.
+<li><em>.osm.pbf</em> - binary (<a href="https://en.wikipedia.org/wiki/Protocol_Buffers">protobuf</a>-based) format.
+<li><em>.osc</em> - OSM "diff" file for replication.
+</ul>
+
+<h2>Recap: The OSM data model</h2>
+<p>Three geometry types:
+<ul>
+<li><em>Node</em> (Point)</li>
+<li><em>Way</em> (LineString or Polygon)</li>
+<li><em>Relation</em> (collections of Nodes, Ways and other Relations)</li>
+</ul>
+</p>
+
+<h2>Example</h2>
+<p>
+<a href="example.osm">Example</a> of OSM XML file.
+</p>
+<p>More info about the OSM file format on the
+<a href="http://wiki.openstreetmap.org/wiki/OSM_XML">OSM Wiki</a>
+</p>
+
+<hr class="break"/>
+
+
+<h2>Importing OSM data into PostGIS</h2>
+
+Need to translate from the OSM data model to postgis. Challenges include:
+<ul>
+<li>Node/way/relation-based geometry.
+<li>Freeform key-value tags.
+<li>No obvious distinction between linear and area features.
+</ul>
+<p>
+Several different tools for different purposes.
+</p>
+<p>
+Overview of tools at:<br/>
+<a href="http://wiki.openstreetmap.org/wiki/PostgreSQL">http://wiki.openstreetmap.org/wiki/PostgreSQL</a>
+</p>
+
+
+<h2>Schemas</h2>
+<p>Common database schemas for PostGIS:</p>
+<ul>
+<li>OSM apidb - The schema of the main OSM DB. No direct geometries.</li>
+<li>pgsnapshot - Somewhat easier to work with than apidb.</li>
+<li>osm2pgsql - Useful for rendering, misc. Easy to work with.</li>
+</ul>
+<p>
+More info at:<br/>
+<a href="http://wiki.openstreetmap.org/wiki/Databases_and_data_access_APIs#Database_Schemas">
+http://wiki.openstreetmap.org/wiki/Databases_and_data_access_APIs#Database_Schemas</a></p>
+
+
+<hr class="break"/>
+
+
+<h2>Osmosis</h2>
+<p>Osmosis is a tool to load, process, convert and save OSM data. Supports the <em>pgsnapshot</em> schema. Useful for analysis.</p>
+<p>
+Details at:<br>
+<a href="http://wiki.openstreetmap.org/wiki/Osmosis">wiki.openstreetmap.org/wiki/Osmosis</a><br/>
+<a href="http://wiki.openstreetmap.org/wiki/Osmosis/Detailed_Usage_0.44">http://wiki.openstreetmap.org/wiki/Osmosis/Detailed_Usage_0.44</a>
+</p>
+<p>Example: Setting it up from <i>geovm1</i> (Ubuntu) on the postgresql server <i>deltaiii</i>:</p>
+<div class="code">lars@geovm1:/usr/share/doc/osmosis/examples$ cat \
+pgsnapshot_schema_0.6.sql | psql -h deltaiii -U lars gis
+
+lars@geovm1:~/Downloads$ osmosis --read-xml file=BostonArea.osm \
+--write-pgsql user=lars host=deltaiii database=gis
+
+lars@geovm1:~/Downloads$ psql -U lars -h deltaiii gis
+psql (9.4.6, server 9.5.1)
+Type "help" for help.
+
+gis=# \dt
+              List of relations
+ Schema |        Name        | Type  | Owner
+--------+--------------------+-------+-------
+ public | nodes              | table | lars
+ public | relation_members   | table | lars
+ public | relations          | table | lars
+ public | schema_info        | table | lars
+ public | users              | table | lars
+ public | way_nodes          | table | lars
+ public | ways               | table | lars
+ public | spatial_ref_sys    | table | lars
+ ...
+(13 rows)
+
+gis=# select count(*) from nodes;
+ count 
+--------
+ 503297
+(1 row)
+</div>
+
+
+<hr class="break"/>
+
+
+<h2>osm2pgsql</h2>
+<p>
+Creates database tables and geometries (LineStrings, Polygons, etc) with attribute columns from OSM tags.
+</p>
+<p>
+Info and installation instructions at:<br>
+<a href="http://wiki.openstreetmap.org/wiki/Osm2pgsql">
+http://wiki.openstreetmap.org/wiki/Osm2pgsql
+</a>
+
+<h2>Install tl;dr</h2>
+<ul>
+<li><em>Linux:</em> - Use your package/software manager, e.g.
+  <div class="code">sudo apt-get install osm2pgsql</div>
+<li><em>Mac:</em> - Use Homebrew package manager
+  <div class="code">brew install osm2pgsql</div>
+<li><em>Windows:</em> - Use a different OS*
+</ul>
+<p>*Binaries for Windows exist, but are generally out of date</p>
+
+<p>For the latest version, don't be afraid to compile yourself:</p>
+<div class="code">sudo apt-get install make cmake g++ libboost-dev libboost-system-dev \
+  libboost-filesystem-dev libexpat1-dev zlib1g-dev \
+  libbz2-dev libpq-dev libgeos-dev libgeos++-dev libproj-dev lua5.2 \
+  liblua5.2-dev
+git clone https://github.com/openstreetmap/osm2pgsql.git
+cd osm2pgsql
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=$HOME
+make
+make install
+</div>
+<p>
+More info in the <a href="https://github.com/openstreetmap/osm2pgsql">osm2psql readme on Github</a>.
+</p>
+
+<h2>Import example</h2>
+<div class="code">osm2pgsql -c --prefix=boston -d gis -U lars -H localhost BostonArea.osm</div>
+<p>Command line explained:</p>
+<ul>
+<li><em>-c</em> Create new tables
+<li><em>--prefix=</em> Prefix for table names
+<li><em>-d</em> Name of the database
+<li><em>-U</em> Database user name
+<li><em>-H</em> Database host
+</ul>
+<div class="code">osm2pgsql -h</div>
+<div class="code">osm2pgsql -h -v</div>
+
+<h2>After import</h2>
+<div class="code">
+lars@geovm1:~$ psql -U lars -h localhost gis
+psql (9.3.11)
+Type "help" for help.
+
+gis=> \dt
+               List of relations
+ Schema |               Name                | Type  | Owner 
+ -------+-----------------------------------+-------+-------
+ public | boston_line                       | table | lars
+ public | boston_points                     | table | lars
+ public | boston_polygon                    | table | lars
+ public | boston_roads                      | table | lars
+ ...
+ public | spatial_ref_sys                   | table | lars
+(23 rows)
+
+gis=>\d boston_line
+               Table "public.boston_line"
+       Column       |            Type             | Modifiers 
+--------------------+-----------------------------+-----------
+ osm_id             | bigint                      | 
+ access             | text                        | 
+ addr:housename     | text                        | 
+ addr:housenumber   | text                        | 
+ addr:interpolation | text                        | 
+ admin_level        | text                        | 
+ aerialway          | text                        | 
+ aerialway_class    | text                        | 
+ aeroway            | text                        | 
+ amenity            | text                        | 
+ area               | text                        | 
+ barrier            | text                        | 
+...
+ z_order            | integer                     | 
+ way_area           | real                        | 
+ way                | geometry(LineString,900913) | 
+Indexes:
+    "boston_line_index" gist (way) WITH (fillfactor='100')
+
+gis=>
+</div>
+
+
+<h2>What data/tags get imported?</h2>
+<p>
+<em>Style file</em> determines:
+<ul>
+<li>What features are imported.
+<li>What OSM tags become columns in the database tables.
+<li>What ways become polygons (rather than circular linestrings).
+</ul>
+<p>Generally: One column per tag.</p>
+<p>If you're missing a tag, copy the <a href="https://raw.githubusercontent.com/openstreetmap/osm2pgsql/master/default.style">default style</a>, modify it and use the <em>--style</em> option (or use hstore (see below)).
+<div class="code">osm2pgsql -c --prefix=boston --style=MyExtraDetailed.style -d gis -U lars -H localhost BostonArea.osm</div>
+<p>Default style file is well commented</p>
+
+
+
+<h2>Other useful osm2pgsql options</h2>
+<ul>
+<li><em>-a</em> Append to existing tables, instead of creating new.
+<li><em>--slim</em> Reduce memory usage (slower; needed for very large imports).
+<li><em>--cache=N</em> Use N MB of RAM for cache. For performance tuning.
+<li><em>--hstore</em> Import <i>all</i> tags into an <em>hstore</em> column.
+<li><em>--latlong</em> Use Lat/Lon (4326) instead of web mercator (3857/900913).
+<li><em>--keep-coastlines</em> Coastlines are imported (special case in OSM).
+<li><em>--tag-transform-script=FILE</em> Use a lua script to pre-process tags.
+</ul>
+
+
+<h2>Coastline</h2>
+<p>The coastline is a special case in OSM because of its length.</p>
+<p>Import with the <em>--keep-coastlines</em> option, or (better) use
+coastline/land/ocean shapefiles from <a href="http://openstreetmapdata.com/">openstreetmapdata.com</a>.
+
+
+<h2>Using hstore</h2>
+<div class="code">osm2pgsql -c --prefix=boston --hstore \
+ -d gis -U lars -H localhost BostonArea.osm</div>
+
+<div class="code">
+lars@geovm1:~$ psql -U lars -h localhost gis
+psql (9.3.11)
+Type "help" for help.
+
+gis=>\d boston_line
+               Table "public.boston_line"
+       Column       |            Type             | Modifiers 
+--------------------+-----------------------------+-----------
+ osm_id             | bigint                      | 
+ access             | text                        | 
+ addr:housename     | text                        | 
+ addr:housenumber   | text                        | 
+ addr:interpolation | text                        | 
+ admin_level        | text                        | 
+...
+ z_order            | integer                     | 
+ way_area           | real                        | 
+ tags               | hstore                      | 
+ way                | geometry(LineString,900913) | 
+Indexes:
+    "boston_line_index" gist (way) WITH (fillfactor='100')
+
+gis=>
+</div>
+
+<p>Example query using hstore tags:</p>
+<p>Select all polygons - and their centerpoint lon/lat - that have an <a href="https://en.wikipedia.org/wiki/International_Civil_Aviation_Organization">ICAO</a> code:</p>
+<div class="code">
+gis=> SELECT osm_id, ST_AsText(ST_Transform(ST_Centroid(way), 4326)),
+gis-> (tags->'iata') AS iata, name
+gis-> FROM boston_polygon WHERE (tags->'iata') IS NOT NULL;
+  osm_id   |         st_astext         | iata |            name             
+-----------+---------------------------+------+----------------------------
+  79839974 | POINT(-71.17363 42.18940) | OWD  | Norwood Memorial Airport
+  95408743 | POINT(-71.28741 42.46888) | BED  | Laurence G. Hanscom Field
+ 291828579 | POINT(-71.01184 42.36406) | BOS  | Logan International Airport
+(3 rows)
+
+gis=>
+</div>
+
+<h2>Using lua scripts</h2>
+<p>
+Supply a lua script to pre-process tags using
+the command line.
+</p>
+<p>
+Example from my
+<a href="http://toposm.ahlzen.com/hikemap.html">Hikemap</a> project:
+</p>
+<ul>
+<li><a href="https://github.com/Ahlzen/Hikemap/blob/master/hikemap.style">hikemap.style</a>
+<li><a href="https://github.com/Ahlzen/Hikemap/blob/master/hikemap_tagtransform.lua">hikemap_tagtransform.lua</a>
+<li><a href="https://github.com/Ahlzen/Hikemap/blob/master/hikemap_tagtransform_tests.lua">Unit tests</a>
+</ul>
+
+
+<hr class="break"/>
+
+
+<h2>Indexes</h2>
+<p>Key to performance!</p>
+
+<p>osm2pgsql creates a GIST spatial index on the geometry (way) column by default.</p>
+
+<p>If you filter common queries based on other columns, add spatial indexes
+that includes those columns as well. For example:</p>
+<div class="code">
+CREATE INDEX ON boston_point USING gist(way) WHERE "natural" = 'peak';
+</div>
+
+<p>Speeds up this type of query by orders of magnitude:</p>
+<div class="code">SELECT way, name, ... FROM boston_point
+WHERE "natural" = 'peak'
+AND way &amp;&amp; ST_MakeEnvelope(-72.0, 42.0, -71.0, 43.0);
+</div>
+
+<p>Good overview on spatial indexes:<br>
+<a href="http://revenant.ca/www/postgis/workshop/indexing.html">
+http://revenant.ca/www/postgis/workshop/indexing.html</a>
+
+
+<hr class="break"/>
+
+
+<h2>QGIS</h2>
+
+<p>Example: Select all public transit stations/stops within a mile of Mapkin HQ:</p>
+<div class="code">
+WITH here AS (SELECT ST_Transform(ST_SetSRID(
+  ST_MakePoint(-71.05940, 42.35348), 4326), 900913) AS p)
+SELECT osm_id, name, ST_Distance(way, here.p) * 3.28 AS distance
+FROM here, boston_point
+WHERE public_transport IN ('station', 'stop_position')
+  AND ST_DWithin(way, here.p, 1609) ORDER BY distance;
+</div>
+<p>(cast geometry to geography for the most accurate result)</p>
+
+<p>Simplify usage with a view:</p>
+<div class="code">
+CREATE VIEW nearby_stations AS
+(WITH here AS (SELECT ST_Transform(ST_SetSRID(
+  ST_MakePoint(-71.05940, 42.35348), 4326), 900913) AS p)
+SELECT way, osm_id, name, ST_Distance(way, here.p) * 3.28 AS distance
+FROM here, boston_point
+WHERE public_transport IN ('station', 'stop_position')
+AND ST_DWithin(way, here.p, 1609));
+</div>
+
+
+<hr class="break"/>
+
+
+<h2>Mapnik</h2>
+<p>Mapnik XML example</p>
+<div class="code">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;!DOCTYPE Map&gt;
+&lt;Map srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0
+  +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over"&gt;
+
+&lt;Style name="BostonBuildings"&gt;
+   &lt;Rule&gt; ... &lt;/Rule&gt;
+&lt;/Style&gt;
+
+...
+
+&lt;Layer name="BostonBuildings" status="on"
+  srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0
+    +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over"&gt;
+   &lt;StyleName&gt;BostonBuildings&lt;/StyleName&gt;
+   &lt;Datasource&gt;
+      &lt;Parameter name="type"&gt;postgis&lt;/Parameter&gt;
+      &lt;Parameter name="password"&gt;****&lt;/Parameter&gt;
+      &lt;Parameter name="host"&gt;localhost&lt;/Parameter&gt;
+      &lt;Parameter name="port"&gt;5432&lt;/Parameter&gt;
+      &lt;Parameter name="user"&gt;lars&lt;/Parameter&gt;
+      &lt;Parameter name="dbname"&gt;gis&lt;/Parameter&gt;
+      &lt;Parameter name="table"&gt;
+        (SELECT way, building, name,
+          (tags-&gt;'height') AS height,
+          (tags-&gt;'building:levels') AS levels
+        FROM boston_polygon
+        WHERE building IS NOT NULL
+        ) AS buildings
+      &lt;/Parameter&gt;
+      &lt;Parameter name="estimate_extent"&gt;false&lt;/Parameter&gt;
+      &lt;Parameter name="extent"&gt;-20037508,-19929239,20037508,19929239&lt;/Parameter&gt;
+  &lt;/Datasource&gt;
+&lt;/Layer&gt;
+
+&lt;/Map&gt; 
+</div>
+
+
+<hr class="break"/>
+
+
+<h2>Other links:</h2>
+
+<p>
+Good site for resources:<br/>
+<a href="https://switch2osm.org/loading-osm-data/">switch2osm.org/loading-osm-data</a><br/>
+(not exclusively for PostGIS, but has lots of useful tips for setting up rendering with OSM and PostGIS)
+</p>
+
+
+<hr class="break"/>
+
+
+<p>Lars Ahlzen<br/>
+<a href="mailto:lars@ahlzen.com">lars@ahlzen.com</a><br/>
+<a href="http://www.meetup.com/OpenStreetMap-Boston/">OpenStreetMap Boston Meetup</a>
+
+
+</body>
+</html>
+
+
